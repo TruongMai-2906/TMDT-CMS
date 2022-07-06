@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import classNames from 'classnames';
-import "./User.scss";
+import "./Order.scss";
 import { Modal } from "antd";
 import { del, get } from "../../utils/api";
 
@@ -14,24 +14,28 @@ export const defaultValue = {
   address: "",
   phone: "",
   amountOrder: 0,
-  amountSpent: 0.
+  amountSpent: 0,
 }
 
-function User() {
-
+function Order() {
+  //*-- đổi field m ở đây
   const [columm, setColumm] = useState(["id", "E-mail", "Tên", "Địa chỉ", "Giới tính", "Số đơn hàng", "Số tiền", "Quản lý"]);
   const [rawData, setRawData] = useState();
-  const [userList, setUserList] = useState([]);
+  const [orderList, setOrderList] = useState([]);
   const [isReload, setIsReload] = useState(false);
+  //*-- số page của m
   const [page, setPage] = useState(1);
+  //*-- số tổng page của m
   const [limit, setLimit] = useState(10);
   useEffect(() => {
     const initData = async () => {
+      //*-- gắn api m zô đây, để chỗ page để lấy số page theo api m
       const response = await get(`/admin/user/user-list?page=${page}&limit=${limit}`);
       console.log("response", response);
       if (response.status === 200) {
         setRawData(response.data)
-        setUserList(response.data.data.userDTOList);
+        //*-- coi form m cái mảng order ở đâu thì chấm tới đó
+        setOrderList(response.data.data.userDTOList);
       }
     }
     
@@ -47,22 +51,22 @@ function User() {
   
   const { register, handleSubmit, watch, formState: { errors }, reset } = useForm();
 
-  const handleEdit = (user) => {
-    console.log(user);
-    reset(user);
-    setPopup({
-      isOpen: !popup.isOpen,
-      data: user,
-    })
-  }
+  // const handleEdit = (user) => {
+  //   console.log(user);
+  //   reset(user);
+  //   setPopup({
+  //     isOpen: !popup.isOpen,
+  //     data: user,
+  //   })
+  // }
 
-  const handleDelete = async (user) => {
-    //call api here
-    const response = await del(`/admin/user/user-list?id=${user.id}`);
-    if (response.status === 200) {
-      setIsReload(!isReload);
-    }
-  }
+  // const handleDelete = async (user) => {
+  //   //call api here
+  //   const response = await del(`/admin/user/user-list?id=${user.id}`);
+  //   if (response.status === 200) {
+  //     setIsReload(!isReload);
+  //   }
+  // }
 
   const onSubmit = data => console.log(data);
 
@@ -356,7 +360,7 @@ function User() {
                 </tr>
               </thead>
               <tbody>
-                {userList.map((user, index) =>
+                {orderList.map((order, index) =>
                   <tr>
                     <td className="table-column-pr-0" key={`user-${index}`}>
                       <div className="custom-control custom-checkbox">
@@ -371,22 +375,24 @@ function User() {
                         </div>
                       </div>
                     </td> */}
-                    <td>{user.id}</td>
-                    <td>{user.email}</td>
-                    <td>{user.name}</td>
-                    <td>{user.address}</td>
-                    <td>{user.gender}</td>
-                    <td>{user.amountOrder}</td>
-                    <td>{user.amountSpent}</td>
+                    {/* //*-- chỗ này gắn từng field của order m vào */}
+                    <td>{order.id}</td>
+                    <td>{order.email}</td>
+                    <td>{order.name}</td>
+                    <td>{order.address}</td>
+                    <td>{order.gender}</td>
+                    <td>{order.amountOrder}</td>
+                    <td>{order.amountSpent}</td>
+                    {/* //*-- này là trạng thái */}
                     <td>
-                      <span className={classNames("legend-indicator", { "bg-success": user.status })} />{user.status ? "Active" : "Inactive"}
+                      <span className={classNames("legend-indicator", { "bg-success": order.status })} />{order.status ? "Active" : "Inactive"}
                     </td>
 
-                    <div className="btn-group" role="group">
-                      <a className="btn btn-sm btn-white" onClick={() => handleDelete(user)}>
+                    {/* <div className="btn-group" role="group">
+                      <a className="btn btn-sm btn-white" onClick={() => handleDelete(order)}>
                         <i className="tio-edit" /> Xóa
                       </a>
-                    </div>
+                    </div> */}
                     {/* <div className="btn-group" role="group">
                       <a className="btn btn-sm btn-white" onClick={() => handleEdit(user)}>
                         <i className="tio-edit" /> Sửa
@@ -437,6 +443,7 @@ function User() {
                   {/* Pagination Quantity */}
                   <span id="datatableWithPaginationInfoTotalQty" />
                   <div style={{ display: "flex", gap: "2px", cursor: "pointer", color: "blue" }}>
+                    {/* //*-- chỗ này m coi tổng trang m bỏ zô, nếu api m hk có thì cmt nó lại */}
                     {rawData && Array(rawData.data.totalPage).fill(0).map((x, page) => 
                       <div onClick={() => {
                         setPage(page + 1);
@@ -463,6 +470,7 @@ function User() {
       </div>
       {/* End Content */}
 
+      {/* //*-- chỗ popup này đơn hàng m hk có thêm j thì cmt nó lại  */}
       <Modal title="Basic Modal" visible={popup.isOpen} onOk={handleSubmit(onSubmit)} onCancel={() => { setPopup({isOpen: false, data: undefined}); reset()}}>
         {popup.isOpen && 
           <form onSubmit={handleSubmit(onSubmit)} className="form-container">
@@ -492,4 +500,4 @@ function User() {
   )
 }
 
-export default User;
+export default Order;

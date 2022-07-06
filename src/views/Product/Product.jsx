@@ -1,44 +1,68 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import classNames from 'classnames';
-import "./User.scss";
+import "./Product.scss";
 import { Modal } from "antd";
-import { del, get } from "../../utils/api";
+import { del, get, post } from "../../utils/api";
 
 export const defaultValue = {
-  id: -1,
-  username: "",
   name: "",
-  email: "",
-  gender: "",
-  address: "",
-  phone: "",
-  amountOrder: 0,
-  amountSpent: 0.
+  color: "",
+  description: "",
+  image: "",
+  price: 0,
+  price_sale: 0,
+  category: {
+    description: "",
+    id: -1,
+    keywork: "",
+    type: "",
+  }
 }
 
-function User() {
+const categoryList = [
+  {
+    id: 1,
+    description: "Áo nữ Second Hand",
+    keywork: "Áo nữ",
+    type: "nữ",
+  },
+  {
+    id: 2,
+    description: "Áo nam Second Hand",
+    keywork: "Áo nam",
+    type: "nam",
+  },
+  {
+    id: 3,
+    description: "Quần nữ Second Hand",
+    keywork: "Quần nữ",
+    type: "nữ",
+  },
+]
 
-  const [columm, setColumm] = useState(["id", "E-mail", "Tên", "Địa chỉ", "Giới tính", "Số đơn hàng", "Số tiền", "Quản lý"]);
+function Product() {
+
+  const [columm, setColumm] = useState(["id", "Tên", "Màu sắc", "Giá", "Giá giảm", "Quản lý"]);
   const [rawData, setRawData] = useState();
-  const [userList, setUserList] = useState([]);
+  const [productList, setProductList] = useState([]);
   const [isReload, setIsReload] = useState(false);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   useEffect(() => {
     const initData = async () => {
-      const response = await get(`/admin/user/user-list?page=${page}&limit=${limit}`);
+      const response = await get(`/admin/product/listProducts?pageIndex=${page}&pageSize=${limit}`);
       console.log("response", response);
       if (response.status === 200) {
         setRawData(response.data)
-        setUserList(response.data.data.userDTOList);
+        setProductList(response.data.products);
       }
     }
     
     initData();
   }, [isReload])
 
-  console.log("rawData:", rawData && Array(rawData.data.totalPage).fill(0).forEach((x, page) => page));
+  console.log("rawData:", rawData);
 
   const [popup, setPopup] = useState({
     isOpen: false,
@@ -47,24 +71,43 @@ function User() {
   
   const { register, handleSubmit, watch, formState: { errors }, reset } = useForm();
 
-  const handleEdit = (user) => {
-    console.log(user);
-    reset(user);
+  const handleEdit = (product) => {
+    console.log(product);
+    reset(product);
     setPopup({
       isOpen: !popup.isOpen,
-      data: user,
+      data: product,
     })
   }
 
-  const handleDelete = async (user) => {
+  const handleAdd = () => {
+    setPopup({
+      isOpen: !popup.isOpen,
+      data: defaultValue,
+    })
+  }
+
+  const handleDelete = async (product) => {
     //call api here
-    const response = await del(`/admin/user/user-list?id=${user.id}`);
+    const response = await post(`/admin/product/deleteProduct/${product.id}`);
     if (response.status === 200) {
       setIsReload(!isReload);
     }
   }
 
-  const onSubmit = data => console.log(data);
+  const onSubmit = async (data) => {
+    data.category = categoryList.find((cat) => cat.id === parseInt(data.category.id));
+    const response = data.id ? await post(`/admin/product/saveProduct`, data) : await post(`/admin/product/postProduct`, data);
+
+    if (response.status === 200) {
+      setPopup({
+        isOpen: !popup.isOpen,
+        data: defaultValue,
+      })
+      setIsReload(!isReload);
+    }
+    
+  };
 
   return (
     <main id="content" role="main" className="main homepage-main">
@@ -182,6 +225,11 @@ function User() {
                   </div>
                   {/* End Datatable Info */}
                   {/* Export Products */}
+                  <div className="hs-unfold mr-2">
+                    <a className="btn btn-sm btn-white" onClick={() => handleAdd()}>
+                      <i className="tio-download-to mr-1" /> Add
+                    </a>
+                  </div>
                   <div className="hs-unfold mr-2">
                     <a className="js-hs-unfold-invoker btn btn-sm btn-white dropdown-toggle" href="javascript:;" data-hs-unfold-options="{
                         &quot;target&quot;: &quot;#usersExportDropdown&quot;,
@@ -356,7 +404,7 @@ function User() {
                 </tr>
               </thead>
               <tbody>
-                {userList.map((user, index) =>
+                {productList.map((product, index) =>
                   <tr>
                     <td className="table-column-pr-0" key={`user-${index}`}>
                       <div className="custom-control custom-checkbox">
@@ -371,39 +419,19 @@ function User() {
                         </div>
                       </div>
                     </td> */}
-                    <td>{user.id}</td>
-                    <td>{user.email}</td>
-                    <td>{user.name}</td>
-                    <td>{user.address}</td>
-                    <td>{user.gender}</td>
-                    <td>{user.amountOrder}</td>
-                    <td>{user.amountSpent}</td>
-                    <td>
-                      <span className={classNames("legend-indicator", { "bg-success": user.status })} />{user.status ? "Active" : "Inactive"}
-                    </td>
-
-                    <div className="btn-group" role="group">
-                      <a className="btn btn-sm btn-white" onClick={() => handleDelete(user)}>
-                        <i className="tio-edit" /> Xóa
-                      </a>
-                    </div>
-                    {/* <div className="btn-group" role="group">
-                      <a className="btn btn-sm btn-white" onClick={() => handleEdit(user)}>
+                    <td>{product.id}</td>
+                    <td>{product.name}</td>
+                    <td>{product.color}</td>
+                    <td>{product.price}</td>
+                    <td>{product.price_sale}</td>
+                    <div className="btn-group" role="group" style={{ display: "flex", gap: "10px" }}>
+                      <a className="btn btn-sm btn-white" onClick={() => handleEdit(product)}>
                         <i className="tio-edit" /> Sửa
                       </a>
-                      <div className="hs-unfold btn-group">
-                        <a className="js-hs-unfold-invoker btn btn-icon btn-sm btn-white dropdown-toggle dropdown-toggle-empty" href="javascript:;" data-hs-unfold-options="{
-                             &quot;target&quot;: &quot;#productsEditDropdown1&quot;,
-                             &quot;type&quot;: &quot;css-animation&quot;,
-                             &quot;smartPositionOffEl&quot;: &quot;#datatable&quot;
-                           }" />
-                        <div id="productsEditDropdown1" className="hs-unfold-content dropdown-unfold dropdown-menu dropdown-menu-right mt-1">
-                          <a className="dropdown-item" onClick={() => handleDelete(user)}>
-                            <i className="tio-delete-outlined dropdown-item-icon" /> Xóa
-                          </a>
-                        </div>
-                      </div>
-                    </div> */}
+                      <a className="btn btn-sm btn-white" onClick={() => handleDelete(product)}>
+                        <i className="tio-delete-outlined" /> Xóa
+                      </a>
+                    </div>
                   </tr>
                 )}
 
@@ -437,7 +465,7 @@ function User() {
                   {/* Pagination Quantity */}
                   <span id="datatableWithPaginationInfoTotalQty" />
                   <div style={{ display: "flex", gap: "2px", cursor: "pointer", color: "blue" }}>
-                    {rawData && Array(rawData.data.totalPage).fill(0).map((x, page) => 
+                    {rawData && Array(rawData.totalPages).fill(0).map((x, page) => 
                       <div onClick={() => {
                         setPage(page + 1);
                         setIsReload(!isReload);
@@ -462,28 +490,46 @@ function User() {
         {/* End Card */}
       </div>
       {/* End Content */}
-
-      <Modal title="Basic Modal" visible={popup.isOpen} onOk={handleSubmit(onSubmit)} onCancel={() => { setPopup({isOpen: false, data: undefined}); reset()}}>
+      <Modal title="Sản phẩm" visible={popup.isOpen} onOk={handleSubmit(onSubmit)} onCancel={() => { setPopup({isOpen: false, data: undefined}); reset()}}>
         {popup.isOpen && 
           <form onSubmit={handleSubmit(onSubmit)} className="form-container">
             <div className="form__item-container">
-              <label htmlFor="name">Name</label>
-              <input defaultValue="test" {...register("name")} />
+              <label htmlFor="name">Tên</label>
+              <input defaultValue="" {...register("name")} />
             </div>
 
             <div className="form__item-container">
-              <label htmlFor="email">Email</label>
-              <input defaultValue="test" {...register("email")} />
+              <label htmlFor="email">Màu sắc</label>
+              <input defaultValue="" {...register("color")} />
             </div>
 
             <div className="form__item-container">
-              <label htmlFor="phone">SĐT</label>
-              <input defaultValue="test" {...register("phoneNumber")} />
+              <label htmlFor="phone">Mô tả</label>
+              <input defaultValue="" {...register("description")} />
             </div>
 
             <div className="form__item-container">
-              <label htmlFor="address">Địa chỉ</label>
-              <input defaultValue="test" {...register("address")} />
+              <label htmlFor="address">Ảnh</label>
+              <input defaultValue="" {...register("image")} />
+            </div>
+
+            <div className="form__item-container">
+              <label htmlFor="address">Giá</label>
+              <input defaultValue="" {...register("price")} />
+            </div>
+
+            <div className="form__item-container">
+              <label htmlFor="address">Giá giảm</label>
+              <input defaultValue="" {...register("price_sale")} />
+            </div>
+
+            <div className="form__item-container">
+              <label htmlFor="category">Danh mục</label>
+              <select {...register("category.id")}>
+                {categoryList && categoryList.map((cat, index) => 
+                  <option key={index} value={`${cat.id}`}>{cat.description}</option>
+                )}
+              </select>
             </div>
           </form>
         }
@@ -492,4 +538,4 @@ function User() {
   )
 }
 
-export default User;
+export default Product;

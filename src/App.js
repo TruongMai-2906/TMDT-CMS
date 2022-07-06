@@ -14,6 +14,8 @@ import {
   HashRouter,
   Navigate,
 } from "react-router-dom";
+import Product from './views/Product/Product';
+import Order from './views/Order/Order';
 
 function App() {
 
@@ -235,27 +237,15 @@ function App() {
                   <li className={classNames("navbar-vertical-aside-has-menu")}>
                     <a className="js-navbar-vertical-aside-menu-link nav-link nav-link-toggle " href="javascript:;" title="Customer Managerment">
                       <i className="tio-user-outlined nav-icon" />
-                      <span className="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Khách hàng </span>
+                      <span className="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Tài khoản </span>
                     </a>
                     <ul className={classNames("js-navbar-vertical-aside-submenu nav nav-sub")}>
                       <li className="nav-item">
-                        <a className="nav-link " href="ecommerce-customers.html" title="Customers">
+                        <a className="nav-link " href="/user" title="Customers">
                           <span className="tio-circle nav-indicator-icon" />
-                          <span className="text-truncate">Kho</span>
+                          <span className="text-truncate">Danh sách</span>
                         </a>
                       </li>
-                      <li className="nav-item">
-                        <a className="nav-link " href="ecommerce-customer-details.html" title="Customer details">
-                          <span className="tio-circle nav-indicator-icon" />
-                          <span className="text-truncate">Chi tiết</span>
-                        </a>
-                      </li>
-                      {/* <li class="nav-item">
-                    <a class="nav-link " href="ecommerce-add-customers.html" title="Add customer">
-                      <span class="tio-circle nav-indicator-icon"></span>
-                      <span class="text-truncate">Thêm</span>
-                    </a>
-                  </li> */}
                     </ul>
                   </li>
                   {/* End User Managerment */}
@@ -263,19 +253,13 @@ function App() {
                   <li className={classNames("navbar-vertical-aside-has-menu")}>
                     <a className="js-navbar-vertical-aside-menu-link nav-link nav-link-toggle " href="javascript:;" title="Order Management" data-placement="left" onClick={() => handleNavShow(1)}>
                       <i className="tio-shopping-cart-outlined nav-icon" />
-                      <span className="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Đơn hàng</span>
+                      <span className="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Sản phẩm</span>
                     </a>
                     <ul className={classNames("js-navbar-vertical-aside-submenu nav nav-sub")}>
                       <li className="nav-item">
-                        <a className="nav-link" href="order-management.html" title="Orders">
+                        <a className="nav-link" href="/product" title="Orders">
                           <span className="tio-circle nav-indicator-icon" />
-                          <span className="text-truncate">Kho</span>
-                        </a>
-                      </li>
-                      <li className="nav-item">
-                        <a className="nav-link " href="ecommerce-order-details.html" title="Order details">
-                          <span className="tio-circle nav-indicator-icon" />
-                          <span className="text-truncate">Chi tiết</span>
+                          <span className="text-truncate">Danh sách</span>
                         </a>
                       </li>
                     </ul>
@@ -285,25 +269,13 @@ function App() {
                   <li className={classNames("navbar-vertical-aside-has-menu")}>
                     <a className="js-navbar-vertical-aside-menu-link nav-link nav-link-toggle " href="javascript:;" title="Product Managerment" onClick={() => handleNavShow(2)}>
                       <i className="tio-shop-outlined nav-icon" />
-                      <span className="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Sản phẩm</span>
+                      <span className="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">Đơn hàng</span>
                     </a>
                     <ul className={classNames("js-navbar-vertical-aside-submenu nav nav-sub")}>
                       <li className="nav-item">
-                        <a className="nav-link " href="product-management.html" title="Products">
+                        <a className="nav-link " href="/order" title="Products">
                           <span className="tio-circle nav-indicator-icon" />
-                          <span className="text-truncate">Kho</span>
-                        </a>
-                      </li>
-                      <li className="nav-item">
-                        <a className="nav-link " href="ecommerce-product-details.html" title="Product details">
-                          <span className="tio-circle nav-indicator-icon" />
-                          <span className="text-truncate">Chi tiết</span>
-                        </a>
-                      </li>
-                      <li className="nav-item">
-                        <a className="nav-link " href="ecommerce-add-product.html" title="Add product">
-                          <span className="tio-circle nav-indicator-icon" />
-                          <span className="text-truncate">Thêm</span>
+                          <span className="text-truncate">Danh sách</span>
                         </a>
                       </li>
                     </ul>
@@ -557,6 +529,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Homepage />}></Route>
           <Route path="/user" element={<User />}></Route>
+          <Route path="/product" element={<Product />}></Route>
+          <Route path="/order" element={<Order />}></Route>
         </Routes>
       </Router>
     </div>
