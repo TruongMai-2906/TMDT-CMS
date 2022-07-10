@@ -24,7 +24,7 @@ function Order() {
   const [orderList, setOrderList] = useState([]);
   const [isReload, setIsReload] = useState(false);
   //*-- số page của m
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   //*-- số tổng page của m
   const [limit, setLimit] = useState(10);
   useEffect(() => {
@@ -481,28 +481,37 @@ function Order() {
         {popup.isOpen && 
           <form onSubmit={handleSubmit(onSubmit)} className="form-container">
             <div className="form__item-container">
-              <label htmlFor="name">Id đơn hàng</label>
-              <input defaultValue="test" {...register("name")} />
+              <label htmlFor="name">User mua</label>
+              <input defaultValue="test" {...register("userid")} />
             </div>
 
             <div className="form__item-container">
-              <label htmlFor="email">User mua</label>
-              <input defaultValue="test" {...register("email")} />
-            </div>
-
-            <div className="form__item-container">
-              <label htmlFor="phone">Địa chỉ giao</label>
-              <input defaultValue="test" {...register("phoneNumber")} />
-            </div>
-
-            <div className="form__item-container">
-              <label htmlFor="address">Số điện thoại</label>
+              <label htmlFor="email">Địa chỉ nhận</label>
               <input defaultValue="test" {...register("address")} />
+            </div>
+
+            <div className="form__item-container">
+              <label htmlFor="phone">Số điện thoại</label>
+              <input defaultValue="test" {...register("phone_number")} />
+            </div>
+
+            <div className="form__item-container">
+              <label htmlFor="address">Phí ship</label>
+              <input defaultValue="test" {...register("shipfee")} />
+            </div>
+            <div className="form__item-container">
+              <label htmlFor="status">Tổng tiền</label>
+              <input defaultValue="test" {...register("total_price_order")} />
             </div>
             <div className="form__item-container">
               <label htmlFor="status">Tình trạng</label>
               <input defaultValue="test" {...register("status")} />
             </div>
+            <div className="form__item-container">
+              <label htmlFor="status">Ngày đặt</label>
+              <input defaultValue="test" {...register("datecreated")} />
+            </div>
+            
           </form>
         }
       </Modal>
