@@ -194,7 +194,7 @@
       /* Start : Init */
 
       var newChartJS = new Chart(el, settings);
-
+      console.log("here");
       /* End : Init */
 
       return newChartJS;

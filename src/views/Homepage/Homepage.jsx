@@ -1,10 +1,78 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Homepage.scss";
+import { del, get, patch } from "../../utils/api";
+import { Chart as ChartJS } from 'chart.js/auto'
+import { Bar, Doughnut } from 'react-chartjs-2';
+
+
 
 function Homepage() {
 
+  // const [chartData, setChartData] = useState({
+  //   label: ["test","2AM","3AM","4AM","5AM","6AM","7AM","8AM","9AM","10AM","11AM"],
+  //   prevData: [200, 300, 290, 350, 150, 350, 300, 100, 125, 220, 200, 300, 290, 350, 150, 350, 300, 100, 125, 220, 225],
+  //   nowData: [150, 230, 382, 204, 169, 290, 300, 100, 300, 225, 120, 150, 230, 382, 204, 169, 290, 300, 100, 300, 140],
+  //   stepSize: 50,
+  //   colorInActive: "#377dff",
+  //   colorActive: "#17ed0c",
+  // });
+
+  // "data": {
+  //   "labels": ${JSON.stringify(chartData.label)},
+  //   "datasets": [{
+  //     "data": ${JSON.stringify(chartData.prevData)},
+  //     "backgroundColor": "${chartData.colorInActive}",
+  //     "hoverBackgroundColor": "${chartData.colorInActive}",
+  //     "borderColor": "${chartData.colorInActive}"
+  //   },
+  //   {
+  //     "data": ${JSON.stringify(chartData.nowData)},
+  //     "backgroundColor": "${chartData.colorActive}",
+  //     "borderColor": "${chartData.colorActive}"
+  //   }]
+  // },
+
+
+  const [newChartData, setNewChartData] = useState({
+    labels: ["test", "2AM", "3AM", "4AM", "5AM", "6AM", "7AM", "8AM", "9AM", "10AM", "11AM"],
+    datasets: [
+      // {
+      //   label: "Doanh thu",
+      //   data: [200, 300, 290, 350, 150, 350, 300, 100, 125, 220, 200, 300, 290, 350, 150, 350, 300, 100, 125, 220, 225],
+      //   backgroundColor: "#377dff",
+      //   hoverBackgroundColor: "#377dff",
+      //   borderColor: "#377dff",
+      // },
+      // {
+      //   label: "Đơn hàng",
+      //   data: [150, 230, 382, 204, 169, 290, 300, 100, 300, 225, 120, 150, 230, 382, 204, 169, 290, 300, 100, 300, 140],
+      //   backgroundColor: "#17ed0c",
+      //   hoverBackgroundColor: "#17ed0c",
+      //   borderColor: "#17ed0c",
+      // }
+    ]
+  })
+
+  const [newDoughnutChartData, setNewDoughnutChartData] = useState({
+    labels: ["Red", "Blue", "Yellow"],
+    datasets: [
+      {
+        label: 'My First Dataset',
+        data: [300, 50, 100],
+        backgroundColor: [
+          'rgb(255, 99, 132)',
+          'rgb(54, 162, 235)',
+          'rgb(255, 205, 86)'
+        ],
+        hoverOffset: 4
+      }
+    ]
+  })
+
+  console.log("newChartData", newChartData);
+
   const [chartData, setChartData] = useState({
-    label: ["test","2AM","3AM","4AM","5AM","6AM","7AM","8AM","9AM","10AM","11AM"],
+    label: ["test", "2AM", "3AM", "4AM", "5AM", "6AM", "7AM", "8AM", "9AM", "10AM", "11AM"],
     prevData: [200, 300, 290, 350, 150, 350, 300, 100, 125, 220, 200, 300, 290, 350, 150, 350, 300, 100, 125, 220, 225],
     nowData: [150, 230, 382, 204, 169, 290, 300, 100, 300, 225, 120, 150, 230, 382, 204, 169, 290, 300, 100, 300, 140],
     stepSize: 50,
@@ -20,6 +88,76 @@ function Homepage() {
     cutoutPercentage: 80,
     postfix: "k",
   });
+
+  useEffect(() => {
+    const initData = async () => {
+      const response = await get(`/admin/chart/net-revenue?time=week`);
+      console.log(response);
+      setNewChartData({
+        ...newChartData,
+        labels: response.data.data.labelList,
+        datasets: [{
+          label: "Doanh thu",
+          data: response.data.data.netRevenue,
+          backgroundColor: "#377dff",
+          hoverBackgroundColor: "#377dff",
+          borderColor: "#377dff",
+        },
+        {
+          label: "Đơn hàng",
+          data: response.data.data.amountOrder,
+          backgroundColor: "#17ed0c",
+          hoverBackgroundColor: "#17ed0c",
+          borderColor: "#17ed0c",
+        }
+        ]
+      })
+      // #-- api here
+      const response2 = await get(`/admin/chart/percent-revenue`);
+      setDoughnutChartData({
+        ...newDoughnutChartData,
+        labels: response2.data.data.labelList,
+        datasets: [
+          {
+            //#-- ten chart
+            label: 'My First Dataset',
+            //#-- data
+            data: response2.data.data.netRevenue,
+            //#-- mau
+            backgroundColor: response2.data.data.backgroundColor,
+            hoverOffset: 4
+          }
+        ],
+      });
+    }
+    initData();
+  }, []);
+
+  const handleBarChart = async (field) => {
+    const response = await get(`/admin/chart/net-revenue?time=${field}`);
+    console.log(response);
+    setNewChartData({
+      ...newChartData,
+      labels: response.data.data.labelList,
+      datasets: [{
+        label: "Doanh thu",
+        data: response.data.data.netRevenue,
+        backgroundColor: "#377dff",
+        hoverBackgroundColor: "#377dff",
+        borderColor: "#377dff",
+      },
+      {
+        label: "Đơn hàng",
+        data: response.data.data.amountOrder,
+        backgroundColor: "#17ed0c",
+        hoverBackgroundColor: "#17ed0c",
+        borderColor: "#17ed0c",
+      }
+      ]
+    })
+  }
+
+  console.log("chartData", chartData);
 
   return (
     <main id="content" role="main" className="main homepage-main">
@@ -134,10 +272,18 @@ function Homepage() {
               </div>
               <div className="col-sm-auto">
                 {/* Daterangepicker */}
-                <button id="js-daterangepicker-predefined" className="btn btn-sm btn-white dropdown-toggle mb-2 mb-sm-0">
+                {/* <button id="js-daterangepicker-predefined" className="btn btn-sm btn-white dropdown-toggle mb-2 mb-sm-0">
                   <i className="tio-date-range" />
                   <span className="js-daterangepicker-predefined-preview ml-1" />
-                </button>
+                </button> */}
+                <div style={{ display: "flex", gap: "2rem", cursor: "pointer" }}>
+                  <div style={{}} onClick={() => handleBarChart("today")}>Today</div>
+                  <div style={{}} onClick={() => handleBarChart("yesterday")}>Yesterday</div>
+                  <div style={{}} onClick={() => handleBarChart("week")}>Week</div>
+                  <div style={{}} onClick={() => handleBarChart("month")}>Month</div>
+                  <div style={{}} onClick={() => handleBarChart("last-month")}>Last Month</div>
+                  <div style={{}} onClick={() => handleBarChart("last-year")}>Last Year</div>
+                </div>
                 {/* End Daterangepicker */}
               </div>
             </div>
@@ -149,68 +295,9 @@ function Homepage() {
             <div className="row">
               <div className="col-md-9 mb-5 mb-md-0">
                 {/* Bar Chart */}
-                <div className="chartjs-custom mb-4">
-                  <canvas className="js-chart" style={{ height: '18rem' }} data-hs-chartjs-options={`{
-                    "type": "bar",
-                    "data": {
-                      "labels": ${JSON.stringify(chartData.label)},
-                      "datasets": [{
-                        "data": ${JSON.stringify(chartData.prevData)},
-                        "backgroundColor": "${chartData.colorInActive}",
-                        "hoverBackgroundColor": "${chartData.colorInActive}",
-                        "borderColor": "${chartData.colorInActive}"
-                      },
-                      {
-                        "data": ${JSON.stringify(chartData.nowData)},
-                        "backgroundColor": "${chartData.colorActive}",
-                        "borderColor": "${chartData.colorActive}"
-                      }]
-                    },
-                    "options": {
-                      "scales": {
-                        "yAxes": [{
-                          "gridLines": {
-                            "color": "#e7eaf3",
-                            "drawBorder": false,
-                            "zeroLineColor": "#e7eaf3"
-                          },
-                          "ticks": {
-                            "beginAtZero": true,
-                            "stepSize": ${chartData.stepSize},
-                            "fontSize": 12,
-                            "fontColor": "#97a4af",
-                            "fontFamily": "Open Sans, sans-serif",
-                            "padding": 10
-                          }
-                        }],
-                        "xAxes": [{
-                          "gridLines": {
-                            "display": false,
-                            "drawBorder": false
-                          },
-                          "ticks": {
-                            "fontSize": 12,
-                            "fontColor": "#97a4af",
-                            "fontFamily": "Open Sans, sans-serif",
-                            "padding": 5
-                          },
-                          "categoryPercentage": 0.5,
-                          "maxBarThickness": "10"
-                        }]
-                      },
-                      "cornerRadius": 2,
-                      "tooltips": {
-                        "hasIndicator": true,
-                        "mode": "index",
-                        "intersect": false
-                      },
-                      "hover": {
-                        "mode": "nearest",
-                        "intersect": true
-                      }
-                    }
-                  }`} />
-                </div>
+                {chartData && <div className="chartjs-custom mb-4">
+                  <Bar data={newChartData} />
+                </div>}
                 {/* End Bar Chart */}
                 {/* Legend Indicators */}
                 <div className="row justify-content-center">
@@ -489,8 +576,9 @@ function Homepage() {
               {/* Body */}
               <div className="card-body">
                 {/* Pie Chart */}
-                <div className="chartjs-custom mb-3 mb-sm-5" style={{ height: '14rem' }}>
-                  <canvas className="js-chart" style={{ height: '18rem' }} id="updatingDoughnutChart" data-hs-chartjs-options={`{
+                <div className="chartjs-custom mb-3 mb-sm-5" style={{ overflow: "unset" }}>
+                  <Doughnut data={newDoughnutChartData} />
+                  {/* <canvas className="js-chart" style={{ height: '18rem' }} id="updatingDoughnutChart" data-hs-chartjs-options={`{
                     "type": "doughnut",
                     "data": {
                       "labels": ${JSON.stringify(doughnutChartData.label)},
@@ -514,12 +602,12 @@ function Homepage() {
                         "intersect": true
                       }
                     }
-                  }`} />
+                  }`} /> */}
                 </div>
                 {/* End Pie Chart */}
                 {/* Legend Indicators */}
                 <div className="row justify-content-center">
-                  { doughnutChartData.data.map((item, index) => 
+                  {doughnutChartData.data.map((item, index) =>
                     <div className="col-auto mb-3 mb-sm-0" key={`doughnutChartData-${index}`}>
                       <span className="card-title h4">{item}</span>
                       <span className="legend-indicator" style={{ backgroundColor: doughnutChartData.backgroundColor[index] }} />{doughnutChartData.title[index]}

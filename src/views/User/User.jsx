@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import classNames from 'classnames';
 import "./User.scss";
 import { Modal } from "antd";
-import { del, get } from "../../utils/api";
+import { del, get, patch } from "../../utils/api";
 
 export const defaultValue = {
   id: -1,
@@ -59,6 +59,15 @@ function User() {
   const handleDelete = async (user) => {
     //call api here
     const response = await del(`/admin/user/user-list?id=${user.id}`);
+    if (response.status === 200) {
+      setIsReload(!isReload);
+    }
+  }
+
+  const handleActive = async (user) => {
+    const response = await patch(`/admin/user/${user.id}`, {
+      status: !user.status,
+    });
     if (response.status === 200) {
       setIsReload(!isReload);
     }
@@ -378,7 +387,7 @@ function User() {
                     <td>{user.gender}</td>
                     <td>{user.amountOrder}</td>
                     <td>{user.amountSpent}</td>
-                    <td>
+                    <td onClick={() => handleActive(user)} className="user-status">
                       <span className={classNames("legend-indicator", { "bg-success": user.status })} />{user.status ? "Active" : "Inactive"}
                     </td>
 
