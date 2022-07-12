@@ -114,7 +114,8 @@ function Homepage() {
       })
       // #-- api here
       const response2 = await get(`/admin/chart/percent-revenue`);
-      setDoughnutChartData({
+      
+      setNewDoughnutChartData({
         ...newDoughnutChartData,
         labels: response2.data.data.labelList,
         datasets: [
@@ -124,7 +125,7 @@ function Homepage() {
             //#-- data
             data: response2.data.data.netRevenue,
             //#-- mau
-            backgroundColor: response2.data.data.backgroundColor,
+            backgroundColor: response2.data.data.backgroudColor,
             hoverOffset: 4
           }
         ],
@@ -300,14 +301,14 @@ function Homepage() {
                 </div>}
                 {/* End Bar Chart */}
                 {/* Legend Indicators */}
-                <div className="row justify-content-center">
+                {/* <div className="row justify-content-center">
                   <div className="col-auto">
                     <span className="legend-indicator" style={{ backgroundColor: chartData.colorActive }} /> Doanh thu
                   </div>
                   <div className="col-auto">
                     <span className="legend-indicator bg-primary" style={{ backgroundColor: chartData.colorInActive }} /> Đơn hàng
                   </div>
-                </div>
+                </div> */}
                 {/* End Legend Indicators */}
               </div>
               <div className="col-md-3 column-divider-md">
@@ -607,12 +608,12 @@ function Homepage() {
                 {/* End Pie Chart */}
                 {/* Legend Indicators */}
                 <div className="row justify-content-center">
-                  {doughnutChartData.data.map((item, index) =>
+                  {/* {doughnutChartData.data.map((item, index) =>
                     <div className="col-auto mb-3 mb-sm-0" key={`doughnutChartData-${index}`}>
                       <span className="card-title h4">{item}</span>
                       <span className="legend-indicator" style={{ backgroundColor: doughnutChartData.backgroundColor[index] }} />{doughnutChartData.title[index]}
                     </div>
-                  )}
+                  )} */}
                   {/* <div className="col-auto mb-3 mb-sm-0">
                     <span className="card-title h4">$2,332.00</span>
                     <span className="legend-indicator bg-primary" />Giày
